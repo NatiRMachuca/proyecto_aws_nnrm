@@ -1,0 +1,7 @@
+Resources:
+    TransferBucket:
+      Type: "AWS::S3::Bucket"
+      Properties:
+        BucketName: ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
+        VersioningConfiguration:
+          Status: Enabled

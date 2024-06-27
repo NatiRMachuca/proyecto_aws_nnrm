@@ -1,0 +1,15 @@
+
+Resources:
+    TransferTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.stage}-transfers
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5

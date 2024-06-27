@@ -1,9 +1,12 @@
+# serverless.yml
+
 service: natyAwsProject
 frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs18.x
+  region: ${env:AWS_DEFAULT_REGION, "us-east-1"}
   stage: ${env:STAGE, "dev"}
   httpApi:
     cors: true
@@ -12,6 +15,11 @@ provider:
       name: ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
       versioningConfiguration:
         Status: Enabled
+# Resources
+resources:
+  - ${file(resources/s3.yml)}
+  - ${file(resources/dynamoTable.yml)}
+  - ${file(resources/lambdaRole.yml)}
 
 functions:
   getT:
@@ -22,6 +30,7 @@ functions:
           method: get
     environment:
       TABLE_NAME: ${self:provider.stage}-transfers
+    role: LambdasDefaultRole
   postT:
     handler: src/transferencias/insertar.handler
     events:
@@ -30,6 +39,7 @@ functions:
           method: post
     environment:
       TABLE_NAME: ${self:provider.stage}-transfers
+    role: LambdasDefaultRole
   getTbyId:
     handler: src/transferencias/consultarId.handler
     events:
@@ -38,6 +48,7 @@ functions:
           method: get
     environment:
       TABLE_NAME: ${self:provider.stage}-transfers
+    role: LambdasDefaultRole
   deleteTbyId:
     handler: src/transferencias/eliminar.handler
     events:
@@ -46,6 +57,7 @@ functions:
           method: delete
     environment:
       TABLE_NAME: ${self:provider.stage}-transfers
+    role: LambdasDefaultRole
   putTbyId:
     handler: src/transferencias/actualizar.handler
     events:
@@ -54,6 +66,7 @@ functions:
           method: put
     environment:
       TABLE_NAME: ${self:provider.stage}-transfers
+    role: LambdasDefaultRole
 
 plugins:
   - serverless-offline
@@ -62,19 +75,3 @@ custom:
     httpPort: 3000
     host: 0.0.0.0
     reloadHandler: true
-# Resources
-resources:
-  Resources:
-    transferTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.stage}-transfers
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5

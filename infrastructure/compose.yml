@@ -10,8 +10,10 @@ services:
       - "3000:3000"
     volumes:
       - ../src:/app/src
+      - ../resources:/app/resources
     env_file:
       - ../.env
     command:
       - ${ARG1}
+   
     
