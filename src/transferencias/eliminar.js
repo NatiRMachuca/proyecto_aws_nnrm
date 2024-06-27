@@ -8,7 +8,7 @@ exports.handler = async (event) => {
     let response={statusCode: 200}
 
     const { httpMethod, pathParameters } = event;
-    if(pathParameters.id!=undefined && pathParameters.id!=null ) idBuscar=pathParameters.id
+    if(pathParameters.idTransfer!=undefined && pathParameters.idTransfer!=null ) idBuscar=pathParameters.idTransfer
 
     console.log("TABLE_NAME",TABLE_NAME,"idBuscar",idBuscar,"pathParameters",pathParameters);
     const params = {

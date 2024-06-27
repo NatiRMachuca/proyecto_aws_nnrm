@@ -7,14 +7,16 @@ exports.handler = async (event) => {
     let idBuscar="";
     let response={statusCode: 200}
 
-    const { httpMethod, pathParameters,body} = event;
-    if(pathParameters.id!=undefined && pathParameters.id!=null ) idBuscar=pathParameters.id
+    const { httpMethod, pathParameters,body:rawBody} = event;
+    if(pathParameters.idTransfer!=undefined && pathParameters.idTransfer!=null ) idBuscar=pathParameters.idTransfer
 
     console.log("TABLE_NAME",TABLE_NAME,"idBuscar",idBuscar,"pathParameters",pathParameters);
     
     const updateExpression = [];
     const ExpressionAttributeNames = {};
     const ExpressionAttributeValues = {};
+
+    const body=JSON.parse(rawBody);
 
     for (const key in body) {
         updateExpression.push(`#${key} = :${key}`);

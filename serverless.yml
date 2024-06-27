@@ -30,6 +30,30 @@ functions:
           method: post
     environment:
       TABLE_NAME: ${self:provider.stage}-transfers
+  getTbyId:
+    handler: src/transferencias/consultarId.handler
+    events:
+      - httpApi:
+          path: /transferencias/{idTransfer}
+          method: get
+    environment:
+      TABLE_NAME: ${self:provider.stage}-transfers
+  deleteTbyId:
+    handler: src/transferencias/eliminar.handler
+    events:
+      - httpApi:
+          path: /transferencias/{idTransfer}
+          method: delete
+    environment:
+      TABLE_NAME: ${self:provider.stage}-transfers
+  putTbyId:
+    handler: src/transferencias/actualizar.handler
+    events:
+      - httpApi:
+          path: /transferencias/{idTransfer}
+          method: put
+    environment:
+      TABLE_NAME: ${self:provider.stage}-transfers
 
 plugins:
   - serverless-offline
