@@ -5,6 +5,7 @@ const path = require('path');
 require('dotenv').config();
 
 const TABLE_NAME = process.env.TABLE_NAME;
+
 AWS.config.update({
     accessKeyId: process.env.ACCESS_ID,
     secretAccessKey:  process.env.ACCESS_SECRET,

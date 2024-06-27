@@ -1,14 +1,13 @@
 const dynamoHandler = require('../sdk/dynamodb/index.js');
 
 exports.handler = async (event) => {
-   
-    let response = await dynamoHandler.readItems();
+    try {
+        let items=await dynamoHandler.readItems();
+         return { statusCode: 200, body: JSON.stringify(items)}
+        
+    } catch (err) {
+        console.error(err);
+        return { statusCode: 403, message: "Ocurrio un error" };
+    }
 
-    return {
-        body: JSON.stringify(response),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
-    
 };

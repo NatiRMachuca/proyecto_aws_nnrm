@@ -1,28 +1,15 @@
-const AWS = require('aws-sdk');
-require('dotenv').config();
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-const TABLE_NAME = process.env.TABLE_NAME;
+const dynamoHandler = require('../sdk/dynamodb/index.js');
 
 exports.handler = async (event) => {
     let idBuscar="";
-    let response={statusCode: 200}
-
-    const { httpMethod, pathParameters } = event;
+    const {pathParameters } = event;
     if(pathParameters.idTransfer!=undefined && pathParameters.idTransfer!=null ) idBuscar=pathParameters.idTransfer
-
-    console.log("TABLE_NAME",TABLE_NAME,"idBuscar",idBuscar,"pathParameters",pathParameters);
-    const params = {
-        TableName: TABLE_NAME,
-        Key: { id: idBuscar}
-    };
     
     try {
-        await dynamodb.delete(params).promise();
-        response= { status: 'success', message: 'Item deleted successfully' };
+        await dynamoHandler.deleteItemById(idBuscar);
+        return { statusCode: 204}
     } catch (err) {
-        response= { status: 'error', message: err.message };
+        console.error(err);
+        return { statusCode: 403, message: "Ocurrio un error" };
     }
-   
-    console.log(response);
-    return response;
 };

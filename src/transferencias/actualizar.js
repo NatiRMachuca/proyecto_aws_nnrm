@@ -1,44 +1,35 @@
-const AWS = require('aws-sdk');
-require('dotenv').config();
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-const TABLE_NAME = process.env.TABLE_NAME;
+const dynamoHandler = require('../sdk/dynamodb/index.js');
 
 exports.handler = async (event) => {
     let idBuscar="";
-    let response={statusCode: 200}
+    let dataUpdate=null;
+    //const {pathParameters,body:rawBody} = event; 
+    //const body=JSON.parse(rawBody);
 
-    const { httpMethod, pathParameters,body:rawBody} = event;
-    if(pathParameters.idTransfer!=undefined && pathParameters.idTransfer!=null ) idBuscar=pathParameters.idTransfer
+    const {pathParameters,body} = event; 
+    if(pathParameters.idTransfer!=undefined && pathParameters.idTransfer!=null ) idBuscar=pathParameters.idTransfer;
 
-    console.log("TABLE_NAME",TABLE_NAME,"idBuscar",idBuscar,"pathParameters",pathParameters);
-    
-    const updateExpression = [];
-    const ExpressionAttributeNames = {};
-    const ExpressionAttributeValues = {};
+    const{monto ,tipo,originName,originRut,originAccount,receiverRut,receiverAccount,originBankCode,originBankName,
+        originAccountType,comment} = JSON.parse(body);
 
-    const body=JSON.parse(rawBody);
-
-    for (const key in body) {
-        updateExpression.push(`#${key} = :${key}`);
-        ExpressionAttributeNames[`#${key}`] = key;
-        ExpressionAttributeValues[`:${key}`] = body[key];
+    if( monto && tipo && originName && originRut && originAccount && receiverRut && receiverAccount 
+        && originBankCode && originBankName && originAccountType
+    ){
+        dataUpdate ={
+            updatedAt: new Date().toISOString(),
+            monto ,tipo,originName,originRut,originAccount,receiverRut,receiverAccount,originBankCode,originBankName,
+            originAccountType,
+            comment: comment || 'NA'
+        }
     }
-
-    console.log("body: ",body,"ExpressionAttributeNames: ",ExpressionAttributeNames);
-    const params = {
-        TableName: TABLE_NAME,
-        Key: { id: idBuscar},
-        UpdateExpression: `set ${updateExpression.join(', ')}`,
-        ExpressionAttributeNames,
-        ExpressionAttributeValues,
-        ReturnValues: 'ALL_NEW'
-    };
+    
 
     try {
-        const data = await dynamodb.update(params).promise();
-        response= { status: 'success', data: data.Attributes };
+        const data = await dynamoHandler.updateItemById(idBuscar, dataUpdate);
+        response= { statusCode: 200, body: JSON.stringify(data.Attributes) };
     } catch (err) {
-        response= { status: 'error', message: err.message };
+        console.error(err);
+        response= { statusCode: 403, message: "Ocurrio un error" };
     }
       
    

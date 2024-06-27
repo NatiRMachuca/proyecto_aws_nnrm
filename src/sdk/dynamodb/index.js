@@ -1,15 +1,19 @@
-const AWS = require('aws-sdk');
-AWS.config.update({region: process.env.AWS_DEFAULT_REGION});
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-const TABLE_NAME = process.env.TABLE_NAME;
 
+const TABLE_NAME = process.env.TABLE_NAME;
+const { DynamoDBClient} = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, ScanCommand, GetCommand,PutCommand,DeleteCommand,UpdateCommand } = require("@aws-sdk/lib-dynamodb");
+const client = new DynamoDBClient({region: process.env.AWS_DEFAULT_REGION});
+const ddbDocClient = DynamoDBDocumentClient.from(client);
 
 const createItem = async (item) => {
     const params = {
         TableName: TABLE_NAME,
         Item: item
     };
-    return dynamodb.put(params).promise();
+    const command = new PutCommand(params);
+    const data = await ddbDocClient.send(command);
+     
+    //return dynamodb.put(params).promise();
 
 };
 
@@ -19,18 +23,16 @@ const readItems = async () => {
         TableName: TABLE_NAME
     };
     
-    try {
-        let data;
-        do {
-            data = await dynamodb.scan(params).promise();
-            items = items.concat(data.Items);
-            params.ExclusiveStartKey = data.LastEvaluatedKey;
-        } while (typeof data.LastEvaluatedKey !== 'undefined');
+    let data;
+    do {
+        const command = new ScanCommand(params);
+        const data = await ddbDocClient.send(command);
+        //data = await dynamodb.scan(params).promise();
+        items = items.concat(data.Items);
+        params.ExclusiveStartKey = data.LastEvaluatedKey;
+    } while (typeof data?.LastEvaluatedKey !== 'undefined');
 
-        return { status: 'success', data:items };
-    } catch (err) {
-        return { status: 'error', message: err.message };
-    }
+    return items;
 };
 
 const readItemById = async (idBuscar) => {
@@ -39,33 +41,51 @@ const readItemById = async (idBuscar) => {
         Key: { id: idBuscar}
     };
 
-    try {
-        const data = await dynamodb.get(params).promise();
-        if (data.Item) {
-            response= {
-                statusCode: 200,
-                body: JSON.stringify(data.Item),
-                headers: { 'Content-Type': 'application/json' }
-            };
-        } else {
-            response= {
-                statusCode: 404,
-                body: JSON.stringify({ message: 'Item not found' }),
-                headers: { 'Content-Type': 'application/json' }
-            };
-        }
-    } catch (err) {
-        console.error(err);
-        response= {
-            statusCode: 500,
-            body: JSON.stringify({ message: "Ocurrio un error" }),
-            headers: { 'Content-Type': 'application/json' }
-        };
+    const command = new GetCommand(params);
+    return ddbDocClient.send(command);
+    
+    //return dynamodb.get(params).promise();
+        
+}
+
+const deleteItemById = async (idBuscar) => {
+    const params = {
+        TableName: TABLE_NAME,
+        Key: { id: idBuscar}
+    };
+    const command= new DeleteCommand(params);
+    return ddbDocClient.send(command);
+    //return dynamodb.delete(params).promise();
+        
+}
+
+const updateItemById = async (idBuscar,updateData) => {
+    const updateExpression = [];
+    const ExpressionAttributeNames = {};
+    const ExpressionAttributeValues = {};
+
+    for (const key in updateData) {
+        updateExpression.push(`#${key} = :${key}`);
+        ExpressionAttributeNames[`#${key}`] = key;
+        ExpressionAttributeValues[`:${key}`] = updateData[key];
     }
+
+    const params = {
+        TableName: TABLE_NAME,
+        Key: { id: idBuscar},
+        UpdateExpression: `set ${updateExpression.join(', ')}`,
+        ExpressionAttributeNames,
+        ExpressionAttributeValues,
+        ReturnValues: 'ALL_NEW'
+    };
+    const command=new UpdateCommand(params);
+    return ddbDocClient.send(command);
+    //return dynamodb.update(params).promise();
+        
 }
 
 
 
 module.exports = {
-    createItem, readItems
+    createItem, readItems,readItemById,deleteItemById,updateItemById
 }
