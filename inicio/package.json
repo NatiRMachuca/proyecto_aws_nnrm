@@ -1,0 +1,14 @@
+{
+  "name": "crud_transferencias",
+  "version": "1.0.0",
+  "description": "lambda para insertar, consultar, eliminar, actualizar transferecnias de dynamodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1649.0"
+  }
+}
