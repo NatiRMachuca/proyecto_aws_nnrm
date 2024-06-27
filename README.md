@@ -1,15 +1,6 @@
-serverless plugin install -n serverless-offline
-serverless deploy    Deploy changes
-serverless info      View deployed endpoints and resources
-serverless invoke    Invoke deployed functions
-serverless --help    Discover more commands
-
-
-serverless offline
-
 
 # Servicios web
-Se genero un crud de servicios web que permiten leer, insertar, modificar y eliminar registros de transferencias.
+Se realizaron una serie de  servicios web que permiten leer, insertar, modificar y eliminar registros de transferencias.
 
 
 ## Environment Variables
@@ -79,88 +70,110 @@ Ejecutar de manera local
 ```
 
 ## Carga Inicial
-## Servicios
-CRUD para insertar, leer, eliminar y modificar registros de tranferencias 
 
-#### Obtener todas las tranferencias
+Para la carga inicial, se genero un s3,una dynamodb y una lambda.
+
+-El nombre del s3
+${env:stage}-transfers-bucket-${env:POSTFIX_RANDOM}
+
+-Se requiere un archivo JSON y que inicie su nombre la palabra "transfer"
+
+-Subir el archivo JSON al s3 y automaticamente se carga  la información que contiene el archivo.
+
+## Servicios
+CRUD para insertar, leer, eliminar y modificar registros de transferencias 
+
+#### Obtener todas las transferencias
 
 ```http
-  GET https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/transferencias/
+  GET https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/transferencias
 ```
 
-#### Obtener tranferencias por id
+#### Obtener transferencias con algunos filtros
+
 ```http
-  GET https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/tranferencias/${id}
+  GET https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/transferencias?tipo=abono&fechaInicio=2024-06-26&fechaFin=2024-06-28&limite=10
+```
+
+#### Obtener transferencias por id
+```http
+  GET https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/transferencias/${id}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `id`      | `string` | **Required**. Id of item to fetch |
+| `id`      | `string` | **Required**. Id de tranferencia a buscar|
 
 #### Insertar una tranferencia
 Recibe un objeto JSON
 
 ```http
-  POST https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/tranferencias/
+  POST https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/transferencias
 ```
 
 ```JSON
-
+{
+  "tipo": "abono",
+  "originName": "NOMBRE EMPRESA INSERT",
+  "originRut": "0223335554",
+  "originAccount": "00000000000087654321",
+  "receiverRut": "0112223334",
+  "receiverAccount": "00000012345678",
+  "originBankCode": "cl_bci",
+  "originBankName": "Banco BCI INSERT",
+  "originAccountType": "cuenta_corriente",
+  "fechaMovimiento": "PRUEBA",
+  "comment": "Comentarios",
+  "validated": true,
+  "inUse": false,
+  "monto": "200",
+  
+}
 ```
 
-| Parameter | Type     | Description                |
-| :-------- | :------- | :------------------------- |
-| `placa` | `string` |placa de vehículo |
-| `numero_economico` | `string` ||
-| `vim` | `string` |  |
-| `asientos` | `number` | El número de asientosque tiene el vehículo |
-| `numero_deseguro` | `number` | El número de seguro del vehículo |
-| `seguro` | `string` | El nombre de seguro del vehículo|
-| `marca` | `string` | La marca del vehículo|
-| `modelo` | `string` | El modelo del vehículo|
-| `anio` | `number` | El anio del vehículo|
-| `color` | `string` | El color del vehículo|
-| `latitud` | `decimal` | La latitud de la ubicación del vehículo|
-| `longitud` | `deciaml` |La longitud  de la ubicación del vehículo |
+#### Eliminar transferencias por id
 
-#### Eliminar tranferencias por id
 ```http
-  DELETE https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/tranferencias/${id}
+  DELETE https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/transferencias/${id}
 ```
 
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
-| `id`      | `string` | **Required**. Id del vehiculo a eliminar|
+| `id`      | `string` | **Required**. Id de la transferencia a eliminar|
 
 
 ```http
-  PUT https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/tranferencias/${id}
+  PUT https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/transferencias/${id}
 ```
 #### Editar tranferencia por id
 
 ```JSON
-
-
+{
+  "tipo": "abono",
+  "originName": "NOMBRE EMPRESA INSERT",
+  "originRut": "0223335554",
+  "originAccount": "00000000000087654321",
+  "receiverRut": "0112223334",
+  "receiverAccount": "00000012345678",
+  "originBankCode": "cl_bci",
+  "originBankName": "Banco BCI INSERT",
+  "originAccountType": "cuenta_corriente",
+  "fechaMovimiento": "PRUEBA",
+  "comment": "Comentarios",
+  "validated": true,
+  "inUse": false,
+  "monto": "200",
+  
+}
 ```
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `id`      | `string` | **Required**. Id del vehiculo a eliminar|
-| `placa` | `string` |placa de vehículo |
-| `numero_economico` | `string` ||
-| `vim` | `string` |  |
-| `asientos` | `number` | El número de asientosque tiene el vehículo |
-| `numero_deseguro` | `number` | El número de seguro del vehículo |
-| `seguro` | `string` | El nombre de seguro del vehículo|
-| `marca` | `string` | La marca del vehículo|
-| `modelo` | `string` | El modelo del vehículo|
-| `anio` | `number` | El anio del vehículo|
-| `color` | `string` | El color del vehículo|
-| `latitud` | `decimal` | La latitud de la ubicación del vehículo|
-| `longitud` | `deciaml` |La longitud  de la ubicación del vehículo |
+| `id`      | `string` | **Required**. Id de la transferencia para editar|
 
 
-## Infraestuctura
+## Diagrama de Infraestuctura
 
+![Alt text](infra.png "Infra")
 
 

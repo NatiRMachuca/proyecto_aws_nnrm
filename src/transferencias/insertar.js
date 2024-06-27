@@ -25,9 +25,8 @@ exports.handler = async (event) => {
         }
         
         try {
-            console.log("dataInsert:::::::::::::::",dataInsert);
             await dynamoHandler.createItem(dataInsert);
-            return { statusCode: 204}
+            return { statusCode: 200, body:JSON.stringify(dataInsert)}
         } catch (err) {
             console.error(err);
             return { statusCode: 403, message: "Ocurrio un error" };

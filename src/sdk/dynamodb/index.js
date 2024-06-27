@@ -11,9 +11,7 @@ const createItem = async (item) => {
         Item: item
     };
     const command = new PutCommand(params);
-    const data = await ddbDocClient.send(command);
-     
-    //return dynamodb.put(params).promise();
+    return ddbDocClient.send(command);
 
 };
 
@@ -23,7 +21,8 @@ const readItems = async (tipo,fechaInicio,fechaFin,limite) => {
     const filterExpression = [];
     const ExpressionAttributeNames = {};
     const ExpressionAttributeValues = {};
-
+    const finicioTS =  new Date(fechaInicio).getTime();
+    const ffinTS =  new Date(fechaFin).getTime();
     if(!!tipo){
         filterExpression.push(`#tipo= :tipo`);
         ExpressionAttributeNames[`#tipo`] = 'tipo';
@@ -31,14 +30,11 @@ const readItems = async (tipo,fechaInicio,fechaFin,limite) => {
     }
 
     if(!!fechaInicio && !!fechaFin){
-        filterExpression.push(`#fecha BETWEEN :fechaInicio AND :fechaFin`);
-        ExpressionAttributeNames[`#fecha`] = 'fecha';
-        ExpressionAttributeValues[`:fechaInicio`] = fechaInicio;
-        ExpressionAttributeValues[`:fechaFin`] = fechaFin;
+        filterExpression.push(`#fechaMoviento BETWEEN :fechaInicio AND :fechaFin`);
+        ExpressionAttributeNames[`#fechaMoviento`] = 'fechaMovimiento';
+        ExpressionAttributeValues[`:fechaInicio`] = finicioTS;
+        ExpressionAttributeValues[`:fechaFin`] = ffinTS;
     }
-
-
-    //console.log(filterExpression,ExpressionAttributeNames,ExpressionAttributeValues,filterExpression.length);
 
     let params = {
         TableName: TABLE_NAME,
@@ -55,7 +51,6 @@ const readItems = async (tipo,fechaInicio,fechaFin,limite) => {
     do {
         const command = new ScanCommand(params);
         const data = await ddbDocClient.send(command);
-        //data = await dynamodb.scan(params).promise();
         items = items.concat(data.Items);
         params.ExclusiveStartKey = data.LastEvaluatedKey;
     } while (typeof data?.LastEvaluatedKey !== 'undefined');

@@ -66,6 +66,7 @@ functions:
     environment:
       TABLE_NAME: ${self:provider.stage}-transfers
       BUCKET_NAME: ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
+    role: LambdasDefaultRole
     events:
       - s3:
           bucket: ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
