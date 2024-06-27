@@ -17,11 +17,39 @@ const createItem = async (item) => {
 
 };
 
-const readItems = async () => {
+const readItems = async (tipo,fechaInicio,fechaFin,limite) => {
     let items=[];
-    const params = {
-        TableName: TABLE_NAME
+
+    const filterExpression = [];
+    const ExpressionAttributeNames = {};
+    const ExpressionAttributeValues = {};
+
+    if(!!tipo){
+        filterExpression.push(`#tipo= :tipo`);
+        ExpressionAttributeNames[`#tipo`] = 'tipo';
+        ExpressionAttributeValues[`:tipo`] = tipo;
+    }
+
+    if(!!fechaInicio && !!fechaFin){
+        filterExpression.push(`#fecha BETWEEN :fechaInicio AND :fechaFin`);
+        ExpressionAttributeNames[`#fecha`] = 'fecha';
+        ExpressionAttributeValues[`:fechaInicio`] = fechaInicio;
+        ExpressionAttributeValues[`:fechaFin`] = fechaFin;
+    }
+
+
+    //console.log(filterExpression,ExpressionAttributeNames,ExpressionAttributeValues,filterExpression.length);
+
+    let params = {
+        TableName: TABLE_NAME,
+        Limit: parseInt(limite, 10) || 10
     };
+
+    if(filterExpression.length>0){
+        params.ExpressionAttributeNames=ExpressionAttributeNames;
+        params.ExpressionAttributeValues=ExpressionAttributeValues;
+        params.FilterExpression=`${filterExpression.join(' AND ')}`;
+    }
     
     let data;
     do {

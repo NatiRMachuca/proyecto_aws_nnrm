@@ -7,9 +7,26 @@ Resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
+          - AttributeName: tipo
+            AttributeType: S
+          - AttributeName: fechaMovimiento
+            AttributeType: N
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+        BillingMode: PROVISIONED
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
+        GlobalSecondaryIndexes:
+          - IndexName: TipofechaIndex
+            KeySchema:
+              - AttributeName: tipo
+                KeyType: HASH
+              - AttributeName: fechaMovimiento
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
