@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 require('dotenv').config();
-AWS.config.update({region: process.env.REGION});
+AWS.config.update({region: process.env.AWS_DEFAULT_REGION});
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = process.env.TABLE_NAME;
 
@@ -23,7 +23,7 @@ const createItem = async (item) => {
 exports.handler = async (event) => {
     const { httpMethod, pathParameters, body } = event;
     console.log(event);
-    const item = body;
+    const item = JSON.parse(body);
     item.id = item.id || Date.now().toString();
     let response = await createItem(item);
             

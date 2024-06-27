@@ -1,0 +1,56 @@
+service: natyAwsProject
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${env:STAGE, "dev"}
+  httpApi:
+    cors: true
+  s3:
+    transfer-bucket:
+      name: ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
+      versioningConfiguration:
+        Status: Enabled
+
+functions:
+  getT:
+    handler: src/transferencias/consultar.handler
+    events:
+      - httpApi:
+          path: /transferencias
+          method: get
+    environment:
+      TABLE_NAME: ${self:provider.stage}-transfers
+  postT:
+    handler: src/transferencias/insertar.handler
+    events:
+      - httpApi:
+          path: /transferencias
+          method: post
+    environment:
+      TABLE_NAME: ${self:provider.stage}-transfers
+
+plugins:
+  - serverless-offline
+custom:
+  serverless-offline:
+    httpPort: 3000
+    host: 0.0.0.0
+    reloadHandler: true
+# Resources
+resources:
+  Resources:
+    transferTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.stage}-transfers
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5

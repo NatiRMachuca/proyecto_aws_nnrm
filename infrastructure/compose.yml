@@ -1,0 +1,17 @@
+name: transactions_local
+services:
+  api_gtw:
+    container_name: naty_transfers
+    image: naty_transfer_image
+    build:
+      context: ../
+      dockerfile: ./infrastructure/dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../src:/app/src
+    env_file:
+      - ../.env
+    command:
+      - ${ARG1}
+    

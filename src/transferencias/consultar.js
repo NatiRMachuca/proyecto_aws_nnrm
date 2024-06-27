@@ -1,12 +1,13 @@
 const AWS = require('aws-sdk');
-require('dotenv').config();
-AWS.config.update({region: process.env.REGION});
+//require('dotenv').config();
+AWS.config.update({region: process.env.AWS_DEFAULT_REGION});
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = process.env.TABLE_NAME;
 
 
 const readItems = async () => {
     let items=[];
+    console.log("table", TABLE_NAME)
     const params = {
         TableName: TABLE_NAME
     };
