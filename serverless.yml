@@ -10,14 +10,8 @@ provider:
   stage: ${env:STAGE, "dev"}
   httpApi:
     cors: true
-  s3:
-    transfer-bucket:
-      name: ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
-      versioningConfiguration:
-        Status: Enabled
 # Resources
 resources:
-  - ${file(resources/s3.yml)}
   - ${file(resources/dynamoTable.yml)}
   - ${file(resources/lambdaRole.yml)}
 
@@ -67,6 +61,18 @@ functions:
     environment:
       TABLE_NAME: ${self:provider.stage}-transfers
     role: LambdasDefaultRole
+  initTable:
+    handler: src/init/index.handler
+    environment:
+      TABLE_NAME: ${self:provider.stage}-transfers
+      BUCKET_NAME: ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
+    events:
+      - s3:
+          bucket: ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: transfers
+            - suffix: .json
 
 plugins:
   - serverless-offline

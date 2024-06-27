@@ -8,36 +8,33 @@ serverless --help    Discover more commands
 serverless offline
 
 
-
-
 # Servicios web
-Se genero un crud de servicios web que permiten leer, insertar, modificar y eliminar registros transferencias
+Se genero un crud de servicios web que permiten leer, insertar, modificar y eliminar registros de transferencias.
 
 
 ## Environment Variables
 
-`STAGE`
-Variable para especificar el entorno a desplegar: dev, QA, Prod, etc
 
-`AWS_ACCESS_KEY_ID`Se requiere el KEY_ID de las credenciales de su usuario de AWS para autenticar y autorizar el acceso a los servicios de AWS 
+1.- Datos de usuario AWS para autenticar y desplegar los servicios de AWS
+
+`AWS_ACCESS_KEY_ID`
 
 `AWS_SECRET_ACCESS_KEY`
-Se requiere el KEY_SECRET de su usuario de AWS para autenticar y autorizar el acceso a los servicios de AWS
 
-`AWS_DEFAULT_REGION`
+`AWS_DEFAULT_REGION` default: us-east-1
+
+2.-Variable para especificar el entorno a desplegar: dev, QA, Prod, etc.
+
+`STAGE` default; dev
+
+3.- Esta variable de entorno es muy importante, se necesita un número ramdom para que no genere conflito al momento de nombrar el s3, pues los nombres del s3 son globales
 
 `POSTFIX_RANDOM`
-Esta variable de etorno es muy importante, se necesita un ramdom para que no genere conflito al momento de nombrar el s3.
 
 
 ## Deployment
 
-Para correr el proyecto de manera local
- 
-
-```bash
-  make run-local
-```
+Se necesita tener instalado docker y la herramienta make
 
 Para desplegar los componentes necesarios
 
@@ -51,24 +48,49 @@ Para eliminar los componentes generados
    make remove
 ```
 
+Si requiere ejecutar el proyecto de manera local
+ 
+```bash
+  make run-local
+```
+
+
+Si se desea ejecutar sin docker se requiere:
+NodeJs 18 y asegurase de que esten configuradas las variables de entorno.
+
+Comandos: 
+
+Instalar dependencias
+```bash
+  npm install
+```
+
+Desplegar componentes
+```bash
+  npx serverless deploy
+```
+Eliminar componentes
+```bash
+  npx serverless remove
+```
+Ejecutar de manera local
+```bash
+  npx serverless offline
+```
+
+## Carga Inicial
 ## Servicios
 CRUD para insertar, leer, eliminar y modificar registros de tranferencias 
 
 #### Obtener todas las tranferencias
 
 ```http
-  GET https://nnrm.talachas.dev/transferencias/?tipo=cargo&fechaInicio=27-06-2024&fechaFin=28-06-2024&limite=10
+  GET https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/transferencias/
 ```
-
-
-```http
-  GET https://nnrm.talachas.dev/api/
-```
-
 
 #### Obtener tranferencias por id
 ```http
-  GET https://nnrm.talachas.dev/tranferencias/${id}
+  GET https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/tranferencias/${id}
 ```
 
 | Parameter | Type     | Description                       |
@@ -79,7 +101,7 @@ CRUD para insertar, leer, eliminar y modificar registros de tranferencias
 Recibe un objeto JSON
 
 ```http
-  POST https://nnrm.talachas.dev/tranferencias/
+  POST https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/tranferencias/
 ```
 
 ```JSON
@@ -103,7 +125,7 @@ Recibe un objeto JSON
 
 #### Eliminar tranferencias por id
 ```http
-  DELETE https://nnrm.talachas.dev/tranferencias/${id}
+  DELETE https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/tranferencias/${id}
 ```
 
 | Parameter | Type     | Description                       |
@@ -112,7 +134,7 @@ Recibe un objeto JSON
 
 
 ```http
-  PUT https://nnrm.talachas.dev/tranferencias/${id}
+  PUT https://y9056g5nu3.execute-api.us-east-1.amazonaws.com/tranferencias/${id}
 ```
 #### Editar tranferencia por id
 
@@ -136,6 +158,9 @@ Recibe un objeto JSON
 | `color` | `string` | El color del vehículo|
 | `latitud` | `decimal` | La latitud de la ubicación del vehículo|
 | `longitud` | `deciaml` |La longitud  de la ubicación del vehículo |
+
+
+## Infraestuctura
 
 
 

@@ -31,7 +31,6 @@ Resources:
                           - "log-group:/aws/lambda/*:*:*"
                 - Effect: "Allow"
                   Action:
-                    - "s3:PutObject"
                     - "s3:GetObject"
                     - "s3:ListBucket"
                   Resource:
@@ -39,12 +38,12 @@ Resources:
                       Fn::Join:
                         - ""
                         - - "arn:aws:s3:::"
-                          - Ref: TransferBucket
+                          - ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
                     - 
                       Fn::Join:
                         - ""
                         - - "arn:aws:s3:::"
-                          - Ref: TransferBucket
+                          - ${self:provider.stage}-transfers-bucket-${env:POSTFIX_RANDOM}
                           - "/*"
                 - Effect: "Allow"
                   Action:
